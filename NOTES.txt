@@ -1,0 +1,17 @@
+1. PPT
+https://docs.google.com/presentation/d/1x-dDxj_m0qC-iRnFWn0YE6RjSFgXaQDUw4Fr4tIJzoA/edit#slide=id.g5b8b1f5242_0_5
+2. DOC research framework
+https://docs.google.com/document/d/1drw8xLhCda4xHRrJQcvDEW_lmlYOHKD_YG0FIWNAPHY/edit
+3. sample code
+https://github.com/kinwo/deeprl-navigation
+4. ml-agents
+https://github.com/Unity-Technologies/ml-agents
+5. current virtual enivornment path:
+ml-agents\UnitySDK\Assets\ML-Agents\Examples\WallJump
+6. Raw model
+Here is the link to download the 3D model (with PW oebb3dmodel):
+https://nextcloud.ait.ac.at/index.php/s/J6WpSKS4KTnArc5
+
+
+
+C:\Users\jialutan\Desktop\SCL_navigation\ml-agents\UnitySDK\Assets\ML-Agents\Examples\WallJump\Scenes
