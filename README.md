@@ -18,10 +18,13 @@ This is a repo dedicated to the Senseable City Lab project-AI stations. The goal
 1. To be added...
 
 ### Things-to-do:
-1. Add spatial depth renderer to Camera
-2. Add reward to GoalPlatform and Goals using colliders in MoveHuman code
-3. Test rewards in human environment
-4. Find out why resolution is so low when executing built exe file
+1. Add spatial depth renderer to Camera (solved)
+2. Add reward to GoalPlatform and Goals using colliders in MoveHuman code (solved)
+3. Test rewards in human environment (solved)
+4. Find out why resolution is so low when executing built exe file (solved)
+5. Walls are flying up in the sky
+6. env.reset can only work once
+7. need another move action function (currently the agents aren't restricted by nav-mesh)
 
 ### Tips:
 In brain parameters, space size is set to 3, e.g., when the only vector is position; stacked vector is set to 2 if we only want to store one historical vector (another is current vector).
