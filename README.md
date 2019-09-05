@@ -23,8 +23,8 @@ This is a repo dedicated to the Senseable City Lab project-AI stations. The goal
 3. ~~Test rewards in human environment (solved)~~
 4. ~~Find out why resolution is so low when executing built exe file (solved)~~
 5. Walls are flying up in the sky
-6. env.reset can only work once
-7. need another move action function (currently the agents aren't restricted by nav-mesh)
+6. ~~env.reset can only work once~~
+7. need another move action function (currently the agents aren't restricted by nav-mesh). Currently we have been trying to add controller to the agent. However, the agent is moving randomly and loosing control.
 
 ### Tips:
 In brain parameters, space size is set to 3, e.g., when the only vector is position; stacked vector is set to 2 if we only want to store one historical vector (another is current vector).
