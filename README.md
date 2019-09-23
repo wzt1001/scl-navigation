@@ -18,13 +18,22 @@ This is a repo dedicated to the Senseable City Lab project-AI stations. The goal
 1. To be added...
 
 ### Things-to-do:
+
+Week 4:
 1. ~~Add spatial depth renderer to Camera (solved)~~
 2. ~~Add reward to GoalPlatform and Goals using colliders in MoveHuman code (solved)~~
 3. ~~Test rewards in human environment (solved)~~
 4. ~~Find out why resolution is so low when executing built exe file (solved)~~
-5. Walls are flying up in the sky
-6. env.reset can only work once
-7. need another move action function (currently the agents aren't restricted by nav-mesh)
+5. ~~env.reset can only work once~~
+6. ~~need another move action function (the agents aren't restricted by nav-mesh). Currently we have been trying to add controller to the agent. However, the agent is moving randomly and loosing control.~~
+
+Week5:
+1. Make sure elevators work. (jtan)
+2. Walls are flying up in the sky (jtan)
+3. Export an plan for visualization (jtan)
+4. Make training multi-processing (zwang)
+5. Visualize training results (zwang)
+6. Train... (zwang)
 
 ### Tips:
 In brain parameters, space size is set to 3, e.g., when the only vector is position; stacked vector is set to 2 if we only want to store one historical vector (another is current vector).
