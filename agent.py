@@ -9,12 +9,12 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = 3         # replay buffer size, default int(1e5)
-BATCH_SIZE = 5          # minibatch size
+BUFFER_SIZE = 200       # replay buffer size, default int(1e5)
+BATCH_SIZE = 50         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR = 5e-4               # learning rate 
-UPDATE_EVERY = 8        # how often to update the network
+UPDATE_EVERY = 100       # how often to update the network
 
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 #device = torch.device("cpu")
@@ -33,6 +33,8 @@ class Agent():
         """
         self.state_size = state_size
         self.action_size = action_size
+        self.buffer_size = BUFFER_SIZE
+        self.batch_size = BATCH_SIZE
         self.seed = random.seed(seed)
 
         # Q-Network
@@ -44,7 +46,7 @@ class Agent():
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
+        self.memory = ReplayBuffer(self.action_size, self.buffer_size, self.batch_size, seed)
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
     
@@ -53,11 +55,11 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
-        if self.t_step == 0:
+        if self.t_step == 0 or done == True:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
                 # print('learning!')
-                experiences = self.memory.sample()
+                experiences = self.memory.sample(self.batch_size)
                 self.learn(experiences, GAMMA)
 
     def act(self, state, eps=0.):
@@ -92,12 +94,12 @@ class Agent():
         self.chck = [states, actions, rewards, next_states, dones]
 
         # Get max predicted Q values (for next states) from target model
-        Q_targets_next = self.qnetwork_target(next_states.unsqueeze(0)).detach().max(1)[0].unsqueeze(1)
+        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
         # Compute Q targets for current states 
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
 
         # Get expected Q values from local model
-        Q_expected = self.qnetwork_local(states.unsqueeze(0)).gather(1, actions)
+        Q_expected = self.qnetwork_local(states).gather(1, actions)
 
         # Compute loss
         loss = F.mse_loss(Q_expected, Q_targets)
@@ -147,16 +149,22 @@ class ReplayBuffer:
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
     
-    def sample(self):
+    def sample(self, sample_size):
         """Randomly sample a batch of experiences from memory."""
-        experiences = random.sample(self.memory, k=self.batch_size)
 
-        states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
+        # disable sampling, use all memory // zwang
+        # experiences = random.sample(self.memory, k=self.batch_size)
+        experiences  = random.sample(self.memory, k=sample_size)
+
+        states = torch.from_numpy(np.vstack([np.expand_dims(e.state, axis=0) for e in experiences if e is not None])).float().to(device)
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
-        rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
+
+        # zwang! modified to unify all rewards to final reward
+        # rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
+        rewards = torch.from_numpy(np.vstack([experiences[-1].reward for e in experiences if e is not None])).float().to(device)
+        next_states = torch.from_numpy(np.vstack([np.expand_dims(e.next_state, axis=0) for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
-  
+
         return (states, actions, rewards, next_states, dones)
 
     def __len__(self):
