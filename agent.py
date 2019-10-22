@@ -55,10 +55,10 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
-        if self.t_step == 0 or done == True:
+        if self.t_step == 0 or reward > 0:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
-                # print('learning!')
+                print('learning!')
                 experiences = self.memory.sample(self.batch_size)
                 self.learn(experiences, GAMMA)
 
@@ -160,8 +160,9 @@ class ReplayBuffer:
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
 
         # zwang! modified to unify all rewards to final reward
-        # rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        rewards = torch.from_numpy(np.vstack([experiences[-1].reward for e in experiences if e is not None])).float().to(device)
+        rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
+#         rewards = torch.from_numpy(np.vstack([experiences[-1].reward for e in experiences if e is not None])).float().to(device)
+
         next_states = torch.from_numpy(np.vstack([np.expand_dims(e.next_state, axis=0) for e in experiences if e is not None])).float().to(device)
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
 
