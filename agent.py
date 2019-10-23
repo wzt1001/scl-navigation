@@ -55,12 +55,15 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
         # Learn every UPDATE_EVERY time steps.
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
+        if reward > 0:
+            self.memory.reset_all_rewards(reward)
         if self.t_step == 0 or reward > 0:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
-                print('learning!')
+                # print('\nlearning!')
                 experiences = self.memory.sample(self.batch_size)
                 self.learn(experiences, GAMMA)
+           
 
     def act(self, state, eps=0.):
         """Returns actions for given state as per current policy.
@@ -141,13 +144,18 @@ class ReplayBuffer:
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)  
         self.batch_size = batch_size
-        self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
+        # self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
     
     def add(self, state, action, reward, next_state, done):
         """Add a new experience to memory."""
-        e = self.experience(state, action, reward, next_state, done)
+        # e = self.experience(state, action, reward, next_state, done)
+        e = [state, action, reward, next_state, done]
         self.memory.append(e)
+        
+    def reset_all_rewards(self, new_reward):
+        for i, f in enumerate(self.memory):
+            self.memory[i][2] = new_reward
     
     def sample(self, sample_size):
         """Randomly sample a batch of experiences from memory."""
@@ -156,15 +164,14 @@ class ReplayBuffer:
         # experiences = random.sample(self.memory, k=self.batch_size)
         experiences  = random.sample(self.memory, k=sample_size)
 
-        states = torch.from_numpy(np.vstack([np.expand_dims(e.state, axis=0) for e in experiences if e is not None])).float().to(device)
-        actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
+        states = torch.from_numpy(np.vstack([np.expand_dims(e[0], axis=0) for e in experiences if e is not None])).float().to(device)
+        actions = torch.from_numpy(np.vstack([e[1] for e in experiences if e is not None])).long().to(device)
 
         # zwang! modified to unify all rewards to final reward
-        rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-#         rewards = torch.from_numpy(np.vstack([experiences[-1].reward for e in experiences if e is not None])).float().to(device)
+        rewards = torch.from_numpy(np.vstack([e[2] for e in experiences if e is not None])).float().to(device)
 
-        next_states = torch.from_numpy(np.vstack([np.expand_dims(e.next_state, axis=0) for e in experiences if e is not None])).float().to(device)
-        dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
+        next_states = torch.from_numpy(np.vstack([np.expand_dims(e[3], axis=0) for e in experiences if e is not None])).float().to(device)
+        dones = torch.from_numpy(np.vstack([e[4] for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
 
         return (states, actions, rewards, next_states, dones)
 
