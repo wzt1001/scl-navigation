@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 BUFFER_SIZE = 200       # replay buffer size, default int(1e5)
-BATCH_SIZE = 50         # minibatch size
+BATCH_SIZE = 80         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR = 5e-4               # learning rate 
@@ -62,8 +62,7 @@ class Agent():
             if len(self.memory) > BATCH_SIZE:
                 # print('\nlearning!')
                 experiences = self.memory.sample(self.batch_size)
-                self.learn(experiences, GAMMA)
-           
+                self.learn(experiences, GAMMA)           
 
     def act(self, state, eps=0.):
         """Returns actions for given state as per current policy.
