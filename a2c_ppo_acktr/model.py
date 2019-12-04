@@ -26,18 +26,23 @@ class Policy(nn.Module):
                 raise NotImplementedError
 
         self.base = base(obs_shape[0], **base_kwargs)
+        
+#         num_outputs = action_space.n
+        num_outputs = action_space
+    
+        self.dist = Categorical(self.base.output_size, num_outputs)
 
-        if action_space.__class__.__name__ == "Discrete":
-            num_outputs = action_space.n
-            self.dist = Categorical(self.base.output_size, num_outputs)
-        elif action_space.__class__.__name__ == "Box":
-            num_outputs = action_space.shape[0]
-            self.dist = DiagGaussian(self.base.output_size, num_outputs)
-        elif action_space.__class__.__name__ == "MultiBinary":
-            num_outputs = action_space.shape[0]
-            self.dist = Bernoulli(self.base.output_size, num_outputs)
-        else:
-            raise NotImplementedError
+#         if action_space.__class__.__name__ == "Discrete":
+#             num_outputs = action_space.n
+#             self.dist = Categorical(self.base.output_size, num_outputs)
+#         elif action_space.__class__.__name__ == "Box":
+#             num_outputs = action_space.shape[0]
+#             self.dist = DiagGaussian(self.base.output_size, num_outputs)
+#         elif action_space.__class__.__name__ == "MultiBinary":
+#             num_outputs = action_space.shape[0]
+#             self.dist = Bernoulli(self.base.output_size, num_outputs)
+#         else:
+#             raise NotImplementedError
 
     @property
     def is_recurrent(self):
@@ -173,11 +178,26 @@ class CNNBase(NNBase):
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0), nn.init.calculate_gain('relu'))
 
+        # self.main = nn.Sequential(
+        #     init_(nn.Conv2d(num_inputs, 32, 8, stride=4)), nn.ReLU(),
+        #     init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
+        #     init_(nn.Conv2d(64, 32, 3, stride=1)), nn.ReLU(), Flatten(),
+        #     init_(nn.Linear(32 * 7 * 7, hidden_size)), nn.ReLU())
+        
         self.main = nn.Sequential(
-            init_(nn.Conv2d(num_inputs, 32, 8, stride=4)), nn.ReLU(),
+            init_(nn.Conv2d(num_inputs, 32, kernel_size=8, stride=4)), nn.ReLU(),
             init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
-            init_(nn.Conv2d(64, 32, 3, stride=1)), nn.ReLU(), Flatten(),
-            init_(nn.Linear(32 * 7 * 7, hidden_size)), nn.ReLU())
+            init_(nn.Conv2d(64, 64, 3, stride=1)), nn.ReLU(), Flatten(),
+            init_(nn.Linear(73984, hidden_size)), nn.ReLU())
+        
+        # conv from dqn_model
+        # self.conv1 = nn.Conv2d(in_channels, 32, kernel_size=8, stride=4)
+        # self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2)
+        # self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
+        # self.fc4 = nn.Linear(7 * 7 * 64, 512)
+        # self.conv3 = torch.flatten(self.conv3)
+        # self.fc4 = nn.Linear(73984, 512)
+        # self.fc5 = nn.Linear(512, num_actions)
 
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0))
