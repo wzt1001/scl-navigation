@@ -21,7 +21,7 @@ class RolloutStorage(object):
         # else:
         #     action_shape = action_space.shape[0]
         action_shape = action_space
-        self.actions = torch.zeros(num_steps, num_processes, action_shape)
+        self.actions = torch.zeros(num_steps, num_processes, 1)
         
         # if action_space.__class__.__name__ == 'Discrete':
         #     self.actions = self.actions.long()
