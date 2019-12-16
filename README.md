@@ -37,3 +37,7 @@ Week5:
 
 ### Tips:
 In brain parameters, space size is set to 3, e.g., when the only vector is position; stacked vector is set to 2 if we only want to store one historical vector (another is current vector).
+
+To migrate mlagents to another version please visit https://github.com/Unity-Technologies/ml-agents/blob/0.11.0/docs/Migrating.md
+
+Also, please use Window-Package Manager to install post-processing to enable camera effects
