@@ -47,6 +47,7 @@ Also, please use Window-Package Manager to install post-processing to enable cam
 Dec 22 -
   1. agent reset problem
   2. changed agent turning angle and walking speed
+
 Dec 24 - 
   1. solved depth-map-all-white problem, changed 'far' variable in Unity (solved the turning parmenantly to right problem)
   2. add velocity to input vector
