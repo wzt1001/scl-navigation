@@ -44,6 +44,9 @@ Also, please use Window-Package Manager to install post-processing to enable cam
 
 
 ### Updates:
+Dec 15 -
+  1. added materials finally back to the model: (by linking materials in rhino and then built 3ds and copy the model with textures to the prefab folder in Unity)
+  
 Dec 22 -
   1. agent reset problem: by deactivating navmeshagent before manually moving the agent and then activating after moving
   2. changed agent turning angle and walking speed
