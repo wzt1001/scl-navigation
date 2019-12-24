@@ -45,7 +45,7 @@ Also, please use Window-Package Manager to install post-processing to enable cam
 
 ### Updates:
 Dec 22 -
-  1. agent reset problem
+  1. agent reset problem: by deactivating navmeshagent before manually moving the agent and then activating after moving
   2. changed agent turning angle and walking speed
 
 Dec 24 - 
