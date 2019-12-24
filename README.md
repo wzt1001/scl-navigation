@@ -41,3 +41,13 @@ In brain parameters, space size is set to 3, e.g., when the only vector is posit
 To migrate mlagents to another version please visit https://github.com/Unity-Technologies/ml-agents/blob/0.11.0/docs/Migrating.md
 
 Also, please use Window-Package Manager to install post-processing to enable camera effects
+
+
+### Updates:
+Dec 22 -
+  1. agent reset problem
+  2. changed agent turning angle and walking speed
+Dec 24 - 
+  1. solved depth-map-all-white problem, changed 'far' variable in Unity (solved the turning parmenantly to right problem)
+  2. add velocity to input vector
+  3. multi-agent found we need multiple agents and environments in Unity
