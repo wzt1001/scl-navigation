@@ -41,3 +41,17 @@ In brain parameters, space size is set to 3, e.g., when the only vector is posit
 To migrate mlagents to another version please visit https://github.com/Unity-Technologies/ml-agents/blob/0.11.0/docs/Migrating.md
 
 Also, please use Window-Package Manager to install post-processing to enable camera effects
+
+
+### Updates:
+Dec 15 -
+  1. added materials finally back to the model: (by linking materials in rhino and then built 3ds and copy the model with textures to the prefab folder in Unity)
+  
+Dec 22 -
+  1. agent reset problem: by deactivating navmeshagent before manually moving the agent and then activating after moving
+  2. changed agent turning angle and walking speed
+
+Dec 24 - 
+  1. solved depth-map-all-white problem, changed 'far' variable in Unity (solved the turning parmenantly to right problem)
+  2. add velocity to input vector
+  3. multi-agent found we need multiple agents and environments in Unity
