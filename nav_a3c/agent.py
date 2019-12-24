@@ -184,6 +184,7 @@ class Agent():
                     # !!!!!!
                     # rgb_next, d, vel, reward, running = self.game.step(action_idx)
                     action_transformed = self.get_action(action)
+                    print(action_transformed)
                     self.env_info = self.env.step(action_transformed)[self.brain_name] # send the action to the environment
                     rgb_next = np.asarray(self.env_info.visual_observations[1][0])  # get the next state
                     d = self.window_stack(np.asarray(self.env_info.visual_observations[0][0]))
