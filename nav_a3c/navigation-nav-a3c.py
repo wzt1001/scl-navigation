@@ -187,10 +187,15 @@ class Agent():
         sys.stdout.flush()
         with sess.as_default(), sess.graph.as_default():
             while not coordinator.should_stop():
+                
                 sess.run(self.global_episode.assign_add(1))
                 print('episode:', sess.run(self.global_episode))
                 sys.stdout.flush()
                 
+                if sess.run(self.global_episode) > 100000:
+                    print('10k episode trained')
+                    break
+
                 ep = sess.run(self.global_episode)
                 ep_reward = 0
                 ep_step = 0
@@ -264,6 +269,9 @@ class Agent():
                     coord = self.env_info.vector_observations[0][-3:]
 
                     # !!!!!!
+                    if done:
+                        reward += 20
+
                     # only an estimation, get velocity from previous and current coordination, and action vector
                     vel = self.get_vel(prev_coord, coord, action_transformed)
                     
@@ -330,6 +338,9 @@ class Agent():
                 if ep%config.SAVE_PERIOD==0:
                     saver.save(sess, self.model_path+'/model'+str(ep)+'.cptk')
                     print('model saved')
+                    if epi_reward >= self.max_reward:
+                        saver.save(sess, self.model_path+'/model_best.cptk')
+                    
                     sys.stdout.flush()
 
                     summary = tf.Summary()
@@ -468,10 +479,10 @@ def main():
     # model_time = "1577341381.6629117"
     # env_name = '1226_final_without_visual_goals'
                  
-    env_path = "C:/data/ml-agents-old/scripts/envs/{}/HBF-navigation-experiment.exe".format(env_name)
-
+    env_path = "/home/zwang/envs/new/%s/linux_sign_color.x86_64" % env_name
+    print(env_path)
     # env = UnityEnvironment(file_name="./envs/%s/%s.x86_64" % (env_name, env_name), worker_id=1, seed=1, no_graphics=False)
-    env = UnityEnvironment(file_name=env_path, worker_id=0, seed=1, no_graphics=False)
+    env = UnityEnvironment(file_name=env_path, worker_id=0, seed=1, no_graphics=True)
     env.step()
     default_brain = env.external_brain_names[0]
     brain = env.brains[default_brain]
@@ -501,7 +512,9 @@ def main():
         os.makedirs(model_path)
     if not os.path.exists(gif_path):
         os.makedirs(gif_path)
-                 
+    if not os.path.exists(position_path):
+        os.makedirs(position_path)
+    
     with tf.device('cpu:0'):
         global_episode = tf.Variable(0, trainable=False, dtype=tf.int32)
         trainer = tf.train.RMSPropOptimizer(config.LEARNING_RATE, decay=config.DECAY, 
