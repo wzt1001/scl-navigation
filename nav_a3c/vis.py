@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
 goals = [[-252.8, -26.6, 118.7], [-184.0, -25.9, 89.9], 
          [-121.3, -19.5, 3.8], [-162.1, -27.1, 13.3], [-202.0, -27.3, 11.1],
@@ -36,3 +37,18 @@ def vis_paths(positions, goals=goals, final_goal=final_goal):
     plt.savefig('plot.png', dpi=100)
     plt.show()
     
+def smooth_line(a):
+    x, y, t = a.T
+    t = np.linspace(0, 1, len(x))
+    t2 = np.linspace(0, 1, 100)
+
+    x2 = np.interp(t2, t, x)
+    y2 = np.interp(t2, t, y)
+    sigma = 10
+    x3 = gaussian_filter1d(x2, sigma)
+    y3 = gaussian_filter1d(y2, sigma)
+
+    x4 = np.interp(t, t2, x3)
+    y4 = np.interp(t, t2, y3)
+    
+    return np.float32([x4, y4, t])
