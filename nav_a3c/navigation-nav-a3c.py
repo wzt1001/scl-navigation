@@ -185,6 +185,7 @@ class Agent():
     def run(self, sess, trainer, saver, coordinator):
         print('starting agent:', self.name)
         sys.stdout.flush()
+        self.max_reward = -10
         with sess.as_default(), sess.graph.as_default():
             while not coordinator.should_stop():
                 
@@ -338,9 +339,9 @@ class Agent():
                 if ep%config.SAVE_PERIOD==0:
                     saver.save(sess, self.model_path+'/model'+str(ep)+'.cptk')
                     print('model saved')
-                    if epi_reward >= self.max_reward:
+                    if ep_reward >= self.max_reward:
                         saver.save(sess, self.model_path+'/model_best.cptk')
-                    
+                        self.max_reward = ep_reward
                     sys.stdout.flush()
 
                     summary = tf.Summary()
@@ -469,20 +470,24 @@ def main():
     parser.add_argument('--evaluate', action="store_true", default=False, required=False)
     parser.add_argument('--run_id', default='Null', required=False)
     parser.add_argument('--env_name', default='Null', required=False)
-    
+    parser.add_argument('--worker_id', default=1, required=True)
+    parser.add_argument('--gpu_id', default=1, required=True)
+
     args = parser.parse_args()
     evaluate = args.evaluate
     env_name = args.env_name
     run_id   = args.run_id
-    print(evaluate, env_name, run_id)
+    gpu_id   = args.gpu_id
+    worker_id = int(args.worker_id)
+    print(evaluate, env_name, run_id, gpu_id)
     # model_path = "./model/1226_final_without_visual_goals"
     # model_time = "1577341381.6629117"
     # env_name = '1226_final_without_visual_goals'
                  
-    env_path = "/home/zwang/envs/new/%s/linux_sign_color.x86_64" % env_name
+    env_path = "/home/zwang/envs/new/%s/linux_%s.x86_64" % (env_name, env_name)
     print(env_path)
     # env = UnityEnvironment(file_name="./envs/%s/%s.x86_64" % (env_name, env_name), worker_id=1, seed=1, no_graphics=False)
-    env = UnityEnvironment(file_name=env_path, worker_id=0, seed=1, no_graphics=True)
+    env = UnityEnvironment(file_name=env_path, worker_id=worker_id, seed=1, no_graphics=False)
     env.step()
     default_brain = env.external_brain_names[0]
     brain = env.brains[default_brain]
@@ -514,9 +519,11 @@ def main():
         os.makedirs(gif_path)
     if not os.path.exists(position_path):
         os.makedirs(position_path)
+
+    tf.config.set_soft_device_placement(True)
     
-    with tf.device('cpu:0'):
-        global_episode = tf.Variable(0, trainable=False, dtype=tf.int32)
+    with tf.device('/gpu:%s' % str(gpu_id)):
+        global_episode = tf.Variable(0, trainable=False, dtype='float')
         trainer = tf.train.RMSPropOptimizer(config.LEARNING_RATE, decay=config.DECAY, 
                                             momentum=config.MOMENTUM, epsilon=config.EPSILON)
         master_network = network.Network('global', trainer)
@@ -531,9 +538,9 @@ def main():
             for i in range(config.THREAD):
                 agent_arr.append(Agent(run_id, trainer, global_episode, 
                                        model_path, position_path, gif_path, env, default_brain))
-        saver = tf.train.Saver()
                  
     with tf.Session() as sess:
+        saver = tf.train.Saver()
         coord = tf.train.Coordinator()
         sess.run(tf.global_variables_initializer())
         if evaluate == False:
